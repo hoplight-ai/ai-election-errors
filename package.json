@@ -11,7 +11,8 @@
     "test": "node --test test/*.test.js",
     "export": "node --env-file=.env.local scripts/export-reports.mjs",
     "set-salt": "bash scripts/set-hash-salt.sh",
-    "check:privacy": "node --env-file=.env.local scripts/check-privacy.mjs"
+    "check:privacy": "node --env-file=.env.local scripts/check-privacy.mjs",
+    "check:preview": "swift scripts/check-preview.swift"
   },
   "dependencies": {
     "@vercel/blob": "2.8.0"
