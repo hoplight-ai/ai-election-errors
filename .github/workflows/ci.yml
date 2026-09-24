@@ -1,0 +1,25 @@
+name: ci
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+      - id: install
+        run: npm ci
+      - name: Report checks
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm test
+      - name: Upload helper bundle is current
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          npm run build:client
+          git diff --exit-code vendor/blob-client.js
