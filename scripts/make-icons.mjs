@@ -19,20 +19,33 @@ const iconHtml = (px) => `<!doctype html><meta charset="utf-8">
   <path d="M27 52 L44 68 L74 32" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-const cardHtml = `<!doctype html><meta charset="utf-8">${FONT}
+const LOGO = `<svg width="40" height="40" viewBox="0 0 100 100"><rect x="4" y="4" width="92" height="92" rx="16" fill="${MARK}" stroke="${INK}" stroke-width="8"/><path d="M28 52 L44 67 L73 33" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const cardHtml = `<!doctype html><meta charset="utf-8">${FONT.replace('wght@8..60,700', 'ital,opsz,wght@0,8..60,700;1,8..60,500')}
 <style>
   html,body{margin:0}
-  body{width:1200px;height:630px;background:${PAPER};box-sizing:border-box;padding:72px 90px;
-       display:flex;flex-direction:column;justify-content:space-between;font-family:'Public Sans',sans-serif;color:${INK}}
-  .top{display:flex;align-items:center;gap:14px;font-weight:700;font-size:30px}
-  .dot{width:26px;height:26px;border-radius:5px;background:${MARK};border:4px solid ${INK}}
-  h1{font-family:'Source Serif 4',Georgia,serif;font-size:84px;line-height:1.05;margin:0;letter-spacing:-1px}
-  .hl{background:linear-gradient(transparent 58%,${MARK} 58%,${MARK} 92%,transparent 92%)}
-  .sub{font-size:32px;color:${INK_2};font-weight:600}
+  body{width:1200px;height:630px;background:${PAPER};box-sizing:border-box;padding:64px 72px;
+       display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:center;font-family:'Public Sans',sans-serif;color:${INK}}
+  .top{display:flex;align-items:center;gap:14px;font-weight:700;font-size:28px;margin-bottom:34px}
+  h1{font-family:'Source Serif 4',Georgia,serif;font-size:66px;line-height:1.06;margin:0 0 28px;letter-spacing:-1px}
+  .hl{background:linear-gradient(transparent 54%,${MARK} 54%,${MARK} 96%,transparent 96%)}
+  .sub{font-size:28px;color:${INK_2};font-weight:600}
+  .card{background:#fff;border:2px solid #dedad0;border-radius:18px;padding:26px;box-shadow:0 18px 40px -22px rgba(22,24,29,.35)}
+  .b{border-radius:16px;padding:14px 18px;font-size:22px;line-height:1.4}
+  .you{background:#efebe2;margin:0 0 14px 40px}
+  .ai{background:#f4f5f7;border:1px solid #e3e5ea}
+  .s{text-decoration:line-through;text-decoration-thickness:3px;background:linear-gradient(transparent 50%,${MARK} 50%,${MARK} 90%,transparent 90%)}
+  .n{font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-weight:500;font-size:22px;margin:18px 0 0;padding-left:14px;border-left:4px solid ${INK}}
 </style>
-<div class="top"><span class="dot"></span>AI Election Errors</div>
-<h1>Did an AI give you <span class="hl">wrong</span> election information?</h1>
-<div class="sub">Report it. Help build the public record.</div>`;
+<div>
+  <div class="top">${LOGO}AI Election Errors</div>
+  <h1>Did an AI give you <span class="hl">wrong</span> election information?</h1>
+  <div class="sub">Report it. Help build a shared record.</div>
+</div>
+<div class="card">
+  <div class="b you">When is the deadline to register to vote here?</div>
+  <div class="b ai">The deadline is <span class="s">October 5</span>.</div>
+  <p class="n">That was last election's date.</p>
+</div>`;
 
 const browser = await chromium.launch();
 async function shot(html, w, h, file) {

@@ -37,6 +37,11 @@ test('values outside the lists are dropped', () => {
   assert.ok(errors.includes('Pick which AI it was.'));
 });
 
+test('each error is tied to the field it belongs to', () => {
+  const { fieldErrors } = validateReport({ ...good, product: '', issue_types: [] });
+  assert.deepEqual(Object.keys(fieldErrors).sort(), ['issue_types', 'product']);
+});
+
 test('attachments must be private blobs filed under this report', () => {
   const { report } = validateReport({
     ...good,

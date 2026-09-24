@@ -4,13 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Election Errors: report a wrong answer</title>
-<meta name="description" content="Did a chatbot or AI search tool give you wrong election information? Report it here. We are building a public record of what AI tells voters in everyday use.">
+<meta name="description" content="Did an AI give you wrong election information? Report it here and help build a shared record of what AI tells voters.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AI Election Errors: report a wrong answer">
-<meta property="og:description" content="Did an AI give you wrong election information? Report it. We are building a public record of what AI tells voters in everyday use.">
+<meta property="og:description" content="Did an AI give you wrong election information? Report it here and help build a shared record of what AI tells voters.">
+<meta property="og:site_name" content="AI Election Errors">
 <meta property="og:image" content="https://ai-election-errors.vercel.app/og-ai-election-errors-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Did an AI give you wrong election information? Report it.">
 <meta property="og:url" content="https://ai-election-errors.vercel.app/">
+<link rel="canonical" href="https://ai-election-errors.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Election Errors: report a wrong answer">
+<meta name="twitter:description" content="Did an AI give you wrong election information? Report it here and help build a shared record of what AI tells voters.">
 <meta name="twitter:image" content="https://ai-election-errors.vercel.app/og-ai-election-errors-1200x630.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AI Election Errors">
@@ -20,19 +27,23 @@
 <link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;0,8..60,700;1,8..60,500&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper: #f6f4ef;
+    --paper-2: #efebe2;
     --card: #ffffff;
     --ink: #16181d;
-    --ink-2: #4a4f5a;
-    --ink-3: #737987;
+    --ink-2: #464b56;
+    --ink-3: #5b6070;
     --line: #dedad0;
+    --control: #bdb7a9;
     --mark: #ffd84d;
     --focus: #1f5fd6;
     --bad: #b3261e;
     --ok: #1b7a43;
+    --r-control: 8px;
+    --r-card: 12px;
     --serif: 'Source Serif 4', Georgia, serif;
     --sans: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
@@ -40,285 +51,386 @@
   html, body { margin: 0; }
   body { background: var(--paper); color: var(--ink); font: 400 17px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
   a { color: inherit; }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  .narrow { max-width: 720px; margin: 0 auto; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .skip { position: absolute; left: 12px; top: -48px; background: var(--ink); color: #fff; padding: 10px 14px; border-radius: var(--r-control); z-index: 10; text-decoration: none; }
+  .skip:focus { top: 10px; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
+  /* Masthead */
   header.masthead { border-bottom: 1px solid var(--line); }
-  .masthead .wrap { display: flex; align-items: center; gap: 10px; padding-top: 14px; padding-bottom: 14px; }
-  .mark-dot { width: 14px; height: 14px; border-radius: 3px; background: var(--mark); border: 2px solid var(--ink); flex: none; }
-  .brand { font-weight: 700; letter-spacing: .01em; font-size: 15px; }
-  .masthead nav { margin-left: auto; font-size: 15px; }
-  .masthead nav a { text-decoration: none; color: var(--ink-2); margin-left: 18px; }
+  .masthead .wrap { display: flex; align-items: center; gap: 10px; padding-top: 12px; padding-bottom: 12px; }
+  .logo { width: 24px; height: 24px; flex: none; }
+  .brand { font-weight: 700; font-size: 15px; white-space: nowrap; text-decoration: none; }
+  .masthead nav { margin-left: auto; font-size: 15px; white-space: nowrap; }
+  .masthead nav a { color: var(--ink-2); text-decoration: none; margin-left: 18px; }
   .masthead nav a:hover { color: var(--ink); text-decoration: underline; }
-  .brand, .masthead nav a { white-space: nowrap; }
-  @media (max-width: 480px) { .masthead nav a { margin-left: 12px; font-size: 14px; } .masthead nav a[href="#report"] { display: none; } }
 
-  .hero { padding: 48px 0 28px; }
-  h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1.08; letter-spacing: -.01em; margin: 0 0 18px; }
-  h1 .hl { background: linear-gradient(transparent 58%, var(--mark) 58%, var(--mark) 92%, transparent 92%); padding: 0 .06em; }
-  .lede { font-size: 19px; color: var(--ink-2); max-width: 36em; margin: 0 0 14px; }
-  .examples { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 8px; }
-  .examples li { padding-left: 22px; position: relative; color: var(--ink-2); }
-  .examples li::before { content: ""; position: absolute; left: 0; top: .62em; width: 10px; height: 2px; background: var(--ink); }
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; padding: 52px 0 36px; }
+  .kicker { font-size: 13px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 14px; }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 5.4vw, 54px); line-height: 1.07; letter-spacing: -.012em; margin: 0 0 18px; }
+  h1 .hl { background: linear-gradient(transparent 54%, var(--mark) 54%, var(--mark) 96%, transparent 96%); padding: 0 .06em; }
+  .lede { font-size: 19px; color: var(--ink-2); margin: 0 0 22px; max-width: 34em; }
+  .cta { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; border-radius: var(--r-control); padding: 13px 22px; min-height: 48px; }
+  .cta:hover { background: #2b2f38; }
+  .meta-line { margin: 14px 0 0; font-size: 15px; color: var(--ink-3); }
 
-  form { margin: 8px 0 40px; }
-  fieldset { border: 0; margin: 0 0 18px; padding: 24px 22px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-  legend { float: left; width: 100%; padding: 0; margin: 0 0 4px; font-family: var(--serif); font-weight: 700; font-size: 23px; }
-  legend .step { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink-3); letter-spacing: .08em; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  legend + * { clear: both; }
-  .hint { color: var(--ink-3); font-size: 15px; margin: 2px 0 16px; }
-  label, .q { display: block; font-weight: 600; font-size: 16px; margin: 18px 0 6px; }
-  label .opt, .q .opt { font-weight: 400; color: var(--ink-3); font-size: 14px; margin-left: 4px; }
+  /* The example: one wrong answer, marked up by a reader */
+  .example { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 20px 20px 22px; box-shadow: 0 1px 0 rgba(0,0,0,.03), 0 12px 32px -18px rgba(22,24,29,.25); }
+  .example .tag { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px; }
+  .bubble { border-radius: 14px; padding: 11px 14px; font-size: 15px; line-height: 1.45; max-width: 92%; }
+  .bubble.you { background: var(--paper-2); margin-left: auto; margin-bottom: 10px; }
+  .bubble.ai { background: #f4f5f7; border: 1px solid #e3e5ea; }
+  .bubble.ai .who { display: block; font-size: 12px; font-weight: 700; color: var(--ink-3); margin-bottom: 3px; }
+  .struck { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--ink); background: linear-gradient(transparent 50%, var(--mark) 50%, var(--mark) 90%, transparent 90%); }
+  .note { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 17px; line-height: 1.35; margin: 14px 0 0 4px; padding-left: 14px; border-left: 3px solid var(--ink); }
+
+  /* Help strip */
+  .help { background: var(--paper-2); border-radius: var(--r-card); padding: 12px 16px; font-size: 15px; color: var(--ink-2); margin: 0 0 28px; }
+  .help strong { color: var(--ink); }
+
+  /* Form */
+  form { margin: 0 0 40px; }
+  .progress { display: flex; gap: 6px; margin: 0 0 8px; }
+  .progress span { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+  .progress span.done { background: var(--ink); }
+  .progress-label { font-size: 14px; color: var(--ink-3); margin: 0 0 14px; font-weight: 600; }
+  fieldset.step { border: 1px solid var(--line); border-radius: var(--r-card); margin: 0 0 16px; padding: 24px 22px 26px; background: var(--card); min-width: 0; }
+  legend.title { float: left; width: 100%; padding: 0; margin: 0 0 4px; font-family: var(--serif); font-weight: 700; font-size: 26px; line-height: 1.2; }
+  legend.title + * { clear: both; }
+  .hint { color: var(--ink-3); font-size: 15px; margin: 4px 0 14px; }
+  label.f, .q { display: block; font-weight: 600; font-size: 16px; margin: 20px 0 6px; }
+  .opt { font-weight: 400; color: var(--ink-3); font-size: 14px; margin-left: 4px; }
+  .req { font-weight: 600; color: var(--ink-3); font-size: 13px; margin-left: 4px; }
   input[type=text], input[type=email], input[type=url], input[type=date], input[type=time], select, textarea {
     width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: #fff;
-    border: 1px solid #c9c4b8; border-radius: 7px; padding: 11px 12px; min-height: 46px;
+    border: 1px solid var(--control); border-radius: var(--r-control); padding: 11px 12px; min-height: 48px;
   }
-  textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
-  textarea.big { min-height: 180px; }
-  input:focus, select:focus, textarea:focus, .chip input:focus-visible + span, .drop:focus-within {
-    outline: 3px solid color-mix(in srgb, var(--focus) 35%, transparent); outline-offset: 1px; border-color: var(--focus);
-  }
+  textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { outline: 3px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
+  [aria-invalid="true"] { border-color: var(--bad) !important; }
+  .ferr { color: var(--bad); font-weight: 600; font-size: 15px; margin: 6px 0 0; }
+  .ferr:empty { display: none; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
-  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } fieldset { padding: 20px 16px; } }
+  .more { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 4px; }
+  .more summary { cursor: pointer; font-weight: 600; padding: 12px 0; min-height: 44px; list-style-position: inside; }
 
   .chips { display: grid; gap: 8px; margin-top: 10px; }
-  .chip { display: flex; gap: 12px; align-items: flex-start; margin: 0; font-weight: 400; cursor: pointer;
-          border: 1px solid #d6d1c5; border-radius: 8px; padding: 11px 12px; background: #fff; }
+  .chip { display: flex; gap: 12px; align-items: flex-start; margin: 0; cursor: pointer; border: 1px solid #d6d1c5; border-radius: var(--r-control); padding: 11px 12px; background: #fff; min-height: 48px; }
   .chip:hover { border-color: var(--ink-3); }
-  .chip input { margin: 4px 0 0; width: 18px; height: 18px; accent-color: var(--ink); flex: none; }
-  .chip:has(input:checked) { border-color: var(--ink); background: #fffbe6; box-shadow: inset 4px 0 0 var(--mark); }
-  .seg { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-  .seg label { margin: 0; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #d6d1c5; border-radius: 999px; padding: 8px 14px; background: #fff; cursor: pointer; font-size: 15px; }
-  .seg label:has(input:checked) { border-color: var(--ink); background: #fffbe6; }
-  .seg input { accent-color: var(--ink); margin: 0; }
+  .chip input { margin: 3px 0 0; width: 20px; height: 20px; accent-color: var(--ink); flex: none; }
+  .chip .l { display: block; font-weight: 600; }
+  .chip .h { display: block; font-size: 14px; color: var(--ink-3); }
+  .chip:has(input:checked), .pill:has(input:checked), .mode:has(input:checked) { border-color: var(--ink); background: var(--paper-2); }
+  .chip:has(input:focus-visible), .pill:has(input:focus-visible), .mode:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { margin: 0; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #d6d1c5; border-radius: 999px; padding: 0 16px; min-height: 44px; background: #fff; cursor: pointer; font-size: 15px; }
+  .pill input { accent-color: var(--ink); margin: 0; width: 18px; height: 18px; }
 
-  .drop { margin-top: 10px; border: 2px dashed #c1bba9; border-radius: 10px; padding: 24px 16px; text-align: center; background: #fbfaf6; cursor: pointer; }
-  .drop.over { border-color: var(--ink); background: #fffbe6; }
-  .drop strong { display: block; font-size: 16px; }
+  .drop { display: block; margin-top: 10px; border: 2px dashed var(--control); border-radius: var(--r-card); padding: 26px 16px; text-align: center; background: #fbfaf6; cursor: pointer; }
+  .drop.over { border-color: var(--ink); background: var(--paper-2); }
+  .drop:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .drop strong { display: block; font-size: 17px; }
   .drop span { color: var(--ink-3); font-size: 14px; }
   .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
   .files { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
-  .files li { display: flex; align-items: center; gap: 10px; font-size: 15px; background: #fbfaf6; border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; }
+  .files li { display: flex; align-items: center; gap: 10px; font-size: 15px; background: #fbfaf6; border: 1px solid var(--line); border-radius: var(--r-control); padding: 6px 6px 6px 8px; }
+  .files img, .files .ph { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; background: var(--paper-2); flex: none; }
   .files .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .files .st { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+  .files .st { font-size: 13px; color: var(--ink-3); }
   .files .st.ok { color: var(--ok); } .files .st.err { color: var(--bad); }
-  .files button { border: 0; background: none; color: var(--ink-3); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 4px; }
+  .files button { border: 0; background: none; color: var(--ink-2); cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; min-width: 44px; min-height: 44px; border-radius: 6px; }
+  .files button:hover { background: var(--paper-2); }
 
-  .modes { display: grid; gap: 10px; margin: 6px 0 4px; }
-  .mode { display: flex; gap: 12px; align-items: flex-start; margin: 0; font-weight: 400; font-size: 15px; color: var(--ink-2);
-          border: 1px solid #d6d1c5; border-radius: 8px; padding: 14px; background: #fff; cursor: pointer; }
+  .modes { border: 0; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; min-width: 0; }
+  .mode { display: flex; gap: 12px; align-items: flex-start; margin: 0; font-size: 15px; color: var(--ink-2); border: 1px solid #d6d1c5; border-radius: var(--r-control); padding: 14px; background: #fff; cursor: pointer; }
   .mode strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 2px; }
-  .mode input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ink); flex: none; }
-  .mode:has(input:checked) { border-color: var(--ink); background: #fffbe6; box-shadow: inset 4px 0 0 var(--mark); }
-  .check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 14px 0 0; }
-  .check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ink); flex: none; }
+  .mode input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink); flex: none; }
+  .contact-box { margin: 4px 0 0; padding: 4px 16px 16px; border-left: 3px solid var(--line); }
+  .check { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; margin: 16px 0 0; cursor: pointer; }
+  .check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--ink); flex: none; }
+  .check.strong { font-weight: 600; padding: 14px; border: 1px solid var(--line); border-radius: var(--r-control); background: #fbfaf6; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-  .submit-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-  button.primary { font: inherit; font-weight: 700; font-size: 17px; color: #fff; background: var(--ink); border: 0; border-radius: 8px; padding: 14px 26px; cursor: pointer; min-height: 50px; }
-  button.primary:hover { background: #2b2f38; }
-  button.primary:disabled { opacity: .55; cursor: progress; }
-  .errors { color: var(--bad); font-weight: 600; margin: 0 0 14px; }
-  .errors:empty { display: none; }
+  .nav-bar { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+  .btn { font: inherit; font-weight: 700; font-size: 17px; border-radius: var(--r-control); padding: 0 24px; min-height: 50px; cursor: pointer; }
+  .btn.primary { color: #fff; background: var(--ink); border: 0; margin-left: auto; }
+  .btn.primary:hover { background: #2b2f38; }
+  .btn.primary:disabled { opacity: .55; cursor: progress; }
+  .btn.ghost { background: none; border: 1px solid var(--control); color: var(--ink); }
+  .form-error { color: var(--bad); font-weight: 600; margin: 14px 0 0; }
+  .form-error:empty { display: none; }
 
-  .thanks { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 32px 24px; margin: 8px 0 40px; }
-  .thanks h2 { font-family: var(--serif); font-size: 30px; margin: 0 0 10px; }
-  .thanks code { background: #f1eee6; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+  .thanks { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-card); padding: 32px 24px; margin: 8px 0 40px; }
+  .thanks h2 { font-family: var(--serif); font-size: 32px; line-height: 1.15; margin: 0 0 10px; }
+  .thanks code { background: var(--paper-2); padding: 2px 6px; border-radius: 4px; font-size: 15px; }
+  .thanks .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .thanks .actions .btn { display: inline-flex; align-items: center; text-decoration: none; }
 
-  section.about { border-top: 1px solid var(--line); padding: 36px 0 56px; color: var(--ink-2); }
-  section.about h2 { font-family: var(--serif); color: var(--ink); font-size: 26px; margin: 0 0 12px; }
-  section.about h3 { color: var(--ink); font-size: 17px; margin: 26px 0 6px; }
-  section.about p { margin: 0 0 12px; max-width: 38em; }
-  footer { font-size: 14px; color: var(--ink-3); padding: 0 0 40px; }
+  /* About */
+  section.about { border-top: 1px solid var(--line); padding: 44px 0 20px; }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 48px; }
+  section.about h2 { font-family: var(--serif); font-size: 30px; margin: 0 0 14px; grid-column: 1 / -1; }
+  section.about h3 { font-size: 17px; margin: 18px 0 6px; }
+  section.about p { color: var(--ink-2); margin: 0 0 10px; }
+  .levels { list-style: none; padding: 0; margin: 6px 0 0; display: grid; gap: 6px; color: var(--ink-2); font-size: 15px; }
+  .levels b { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--paper-2); color: var(--ink); margin-right: 8px; font-size: 14px; }
+
+  footer.site { border-top: 1px solid var(--line); margin-top: 24px; padding: 26px 0 40px; font-size: 15px; color: var(--ink-3); }
+  footer.site .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 32px; }
+  footer.site strong { color: var(--ink); display: block; margin-bottom: 4px; font-size: 15px; }
+  footer.site p { margin: 0; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 36px; }
+    .about-grid, footer.site .cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .row { grid-template-columns: 1fr; }
+    fieldset.step { padding: 20px 16px 22px; }
+    .masthead nav a { margin-left: 12px; font-size: 14px; }
+    .masthead nav a.hide-sm { display: none; }
+    .lede { font-size: 18px; }
+  }
 </style>
 </head>
 <body>
+<a class="skip" href="#report">Skip to the form</a>
 <header class="masthead">
   <div class="wrap">
-    <span class="mark-dot" aria-hidden="true"></span>
-    <span class="brand">AI Election Errors</span>
-    <nav><a href="#report">Report</a><a href="#about">Why this exists</a></nav>
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect x="4" y="4" width="92" height="92" rx="16" fill="#ffd84d" stroke="#16181d" stroke-width="8"/><path d="M28 52 L44 67 L73 33" fill="none" stroke="#16181d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <a class="brand" href="/">AI Election Errors</a>
+    <nav aria-label="Page"><a class="hide-sm" href="#report">Report</a><a href="#about">About</a></nav>
   </div>
 </header>
 
-<main class="wrap">
-  <div class="hero">
-    <h1>Did an AI give you <span class="hl">wrong</span> election information?</h1>
-    <p class="lede">Chatbots and AI search tools now answer voters' questions every day. Some of those answers are wrong: not because anyone set out to mislead, but because of how these systems work. Tell us what happened. Every report becomes part of a public record.</p>
-    <ul class="examples">
-      <li>It gave you last cycle's deadline, or rules from a law that has since changed.</li>
-      <li>It pointed you to a forum post, a fake news site or a source that turned out to be bot-made.</li>
-      <li>It invented a polling place, a candidate position, a quote or a law.</li>
-    </ul>
+<main id="main" class="wrap">
+  <div class="hero" id="hero">
+    <div>
+      <p class="kicker">An independent, nonpartisan project</p>
+      <h1>Did an AI give you <span class="hl">wrong</span> election information?</h1>
+      <p class="lede">AI chatbots and search tools answer election questions every day. Sometimes they get it wrong, not because anyone meant to mislead, but because of how these tools work. Tell us what happened. Your report helps build a shared record of what AI actually tells voters.</p>
+      <a class="cta" href="#report">Report a wrong answer</a>
+      <p class="meta-line">Takes about 3 minutes. You can stay anonymous.</p>
+    </div>
+    <figure class="example" aria-label="An illustration of the kind of wrong answer to report">
+      <p class="tag">What a report looks like</p>
+      <div class="bubble you">When is the deadline to register to vote here?</div>
+      <div class="bubble ai"><span class="who">AI assistant</span>The deadline is <span class="struck">October 5</span>. You can register online or at your county office.</div>
+      <p class="note">That was last election's date. The state's official site says something different.</p>
+    </figure>
   </div>
 
-  <form id="report" novalidate>
-    <fieldset>
-      <legend><span class="step">Step 1 of 5</span>What went wrong?</legend>
-      <p class="hint">Pick everything that fits.</p>
-      <div class="chips" id="issue-types"></div>
-      <label for="issue_other">Anything else about what went wrong <span class="opt">optional</span></label>
-      <input type="text" id="issue_other" name="issue_other" maxlength="300">
-    </fieldset>
+  <div class="narrow">
+    <p class="help"><strong>Need the right answer now?</strong> Check <a href="https://www.vote.gov/" rel="noopener">vote.gov</a> or your local elections office. This site collects reports. It is not an official election resource.</p>
 
-    <fieldset>
-      <legend><span class="step">Step 2 of 5</span>Which AI, and where?</legend>
-      <div class="row">
-        <div>
-          <label for="occurred_on">Date it happened</label>
-          <input type="date" id="occurred_on" name="occurred_on" required>
-        </div>
-        <div>
-          <label for="occurred_time">Rough time <span class="opt">optional</span></label>
-          <input type="time" id="occurred_time" name="occurred_time">
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <label for="product">Which AI</label>
-          <select id="product" name="product" required><option value="">Choose one</option></select>
-        </div>
-        <div>
-          <label for="model_shown">Model or version, if it showed one <span class="opt">optional</span></label>
-          <input type="text" id="model_shown" name="model_shown" placeholder="e.g. GPT-5, Gemini 3 Flash" maxlength="120">
-        </div>
-      </div>
-      <div id="product-other-wrap" hidden>
-        <label for="product_other">Name of the AI</label>
-        <input type="text" id="product_other" name="product_other" maxlength="120">
-      </div>
-      <label for="surface">Where were you using it?</label>
-      <select id="surface" name="surface" required><option value="">Choose one</option></select>
-      <label for="surface_detail">Which app or site, if it was built into something else <span class="opt">optional</span></label>
-      <input type="text" id="surface_detail" name="surface_detail" placeholder="e.g. Google Search, WhatsApp, Instagram, Bing" maxlength="200">
-      <div class="row">
-        <div>
-          <label for="device">Device <span class="opt">optional</span></label>
-          <select id="device" name="device"><option value="">Choose one</option></select>
-        </div>
-        <div>
-          <label for="language">Language you used <span class="opt">optional</span></label>
-          <input type="text" id="language" name="language" placeholder="e.g. English, Spanish" maxlength="60">
-        </div>
-      </div>
-      <span class="q">Was it searching the web when it answered? <span class="opt">optional</span></span>
-      <div class="seg" data-name="web_search_on"></div>
-      <span class="q">Were you on a paid plan? <span class="opt">optional</span></span>
-      <div class="seg" data-name="paid_plan"></div>
-    </fieldset>
+    <form id="report" novalidate aria-describedby="progress-label">
+      <div class="progress" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <p class="progress-label" id="progress-label" aria-live="polite">Step 1 of 4</p>
 
-    <fieldset>
-      <legend><span class="step">Step 3 of 5</span>The conversation</legend>
-      <p class="hint">Screenshots are the best evidence. Pasting the text as well helps us search and compare reports. Before you upload, crop out your name, photo, email or other chats in the sidebar. We remove hidden location data from images automatically.</p>
-      <label class="drop" id="drop" tabindex="0">
-        <input type="file" id="files" multiple accept="image/*,application/pdf,video/mp4,video/quicktime,video/webm,text/plain">
-        <strong>Add screenshots, a screen recording or a PDF</strong>
-        <span>Drop files here or tap to choose. Up to 10 files, 50 MB each.</span>
-      </label>
-      <ul class="files" id="file-list"></ul>
-      <label for="prompt">What you asked, word for word if you can</label>
-      <textarea id="prompt" name="prompt" maxlength="20000"></textarea>
-      <label for="response">What it answered</label>
-      <textarea id="response" name="response" class="big" maxlength="60000"></textarea>
-      <label for="sources_cited">Links or sources it pointed you to <span class="opt">optional</span></label>
-      <textarea id="sources_cited" name="sources_cited" maxlength="5000" placeholder="Paste any links it showed, one per line"></textarea>
-      <label for="share_link">Share link to the conversation, if the AI offers one <span class="opt">optional</span></label>
-      <input type="url" id="share_link" name="share_link" placeholder="https://" maxlength="500">
-    </fieldset>
+      <fieldset class="step" data-step="1">
+        <legend class="title">Show us what it said</legend>
+        <p class="hint">A screenshot is enough on its own. Crop out your name, photo or other chats first. We strip hidden location data from photos before they upload.</p>
+        <label class="drop" id="drop" for="files">
+          <input type="file" id="files" multiple accept="image/*,application/pdf,video/mp4,video/quicktime,video/webm,text/plain">
+          <strong>Add screenshots</strong>
+          <span>Tap to choose, drop files here, or paste. A screen recording or PDF works too.</span>
+        </label>
+        <ul class="files" id="file-list" aria-live="polite"></ul>
+        <label class="f" for="prompt">What you asked <span class="opt">skip if your screenshot shows it</span></label>
+        <textarea id="prompt" name="prompt" maxlength="20000" aria-describedby="err-prompt"></textarea>
+        <p class="ferr" id="err-prompt"></p>
+        <label class="f" for="response">What it answered <span class="opt">skip if your screenshot shows it</span></label>
+        <textarea id="response" name="response" maxlength="60000" aria-describedby="err-response"></textarea>
+        <p class="ferr" id="err-response"></p>
+        <details class="more">
+          <summary>Add links it gave you, or a share link</summary>
+          <label class="f" for="sources_cited">Links or sources it pointed to <span class="opt">optional</span></label>
+          <textarea id="sources_cited" name="sources_cited" maxlength="5000" placeholder="One per line"></textarea>
+          <label class="f" for="share_link">Share link to the conversation <span class="opt">optional, strongest evidence</span></label>
+          <input type="url" id="share_link" name="share_link" placeholder="https://" maxlength="500">
+        </details>
+      </fieldset>
 
-    <fieldset>
-      <legend><span class="step">Step 4 of 5</span>The election</legend>
-      <div class="row">
-        <div>
-          <label for="election_state">Which state's election <span class="opt">optional</span></label>
-          <select id="election_state" name="election_state"><option value="">Choose one</option></select>
-        </div>
-        <div>
-          <label for="election_locality">County or city <span class="opt">optional</span></label>
-          <input type="text" id="election_locality" name="election_locality" maxlength="120">
-        </div>
-      </div>
-      <label for="election_about">What was it about? <span class="opt">optional</span></label>
-      <input type="text" id="election_about" name="election_about" placeholder="e.g. 2026 general election, mail ballot deadline, a school board race" maxlength="200">
-      <label for="what_was_wrong">What was wrong about the answer? <span class="opt">optional</span></label>
-      <textarea id="what_was_wrong" name="what_was_wrong" maxlength="5000"></textarea>
-      <label for="correct_info">What is actually correct, and how you know <span class="opt">optional</span></label>
-      <textarea id="correct_info" name="correct_info" maxlength="5000" placeholder="e.g. the county elections office site says the deadline is October 20"></textarea>
-    </fieldset>
-
-    <fieldset>
-      <legend><span class="step">Step 5 of 5</span>You and your privacy</legend>
-      <p class="hint">You choose how much we know. We never publish your name, email, phone, ZIP code or city, whichever you pick.</p>
-      <div class="modes">
-        <label class="mode"><input type="radio" name="reporting_mode" value="anonymous" checked>
-          <span><strong>Report anonymously</strong>
-          We keep no name or contact details, no ZIP code, no city and no device details. Only the state your connection came from.</span></label>
-        <label class="mode"><input type="radio" name="reporting_mode" value="contact">
-          <span><strong>Leave a way to reach me, kept private</strong>
-          Your details are stored apart from the report and seen only by the small team reviewing reports. Reports we can follow up on carry more weight with reporters, researchers and regulators, because we can check the original with you.</span></label>
-      </div>
-      <div id="contact-fields" hidden>
+      <fieldset class="step" data-step="2" hidden>
+        <legend class="title">What went wrong?</legend>
+        <p class="hint">Pick everything that fits.</p>
+        <div class="chips" id="issue-types" role="group" aria-label="What went wrong" aria-describedby="err-issue_types"></div>
+        <p class="ferr" id="err-issue_types"></p>
+        <label class="f" for="correct_info">What's actually right, and how do you know? <span class="opt">optional</span></label>
+        <textarea id="correct_info" name="correct_info" maxlength="5000" placeholder="For example: my county elections website says the deadline is October 20."></textarea>
         <div class="row">
           <div>
-            <label for="contact_name">Name <span class="opt">optional</span></label>
-            <input type="text" id="contact_name" name="contact_name" maxlength="120" autocomplete="name">
+            <label class="f" for="election_state">Which state's election <span class="opt">optional</span></label>
+            <select id="election_state" name="election_state"><option value="">Choose one</option></select>
           </div>
           <div>
-            <label for="contact_email">Email</label>
-            <input type="email" id="contact_email" name="contact_email" maxlength="200" autocomplete="email">
+            <label class="f" for="election_locality">County or city <span class="opt">optional</span></label>
+            <input type="text" id="election_locality" name="election_locality" maxlength="120">
           </div>
         </div>
-        <label for="contact_phone">Phone <span class="opt">optional, instead of or as well as email</span></label>
-        <input type="text" id="contact_phone" name="contact_phone" maxlength="40" inputmode="tel" autocomplete="tel">
-        <label class="check"><input type="checkbox" id="ok_to_follow_up" checked> You may contact me to check details or ask for the original.</label>
-        <label class="check"><input type="checkbox" id="ok_to_refer"> I am open to talking with a reporter or researcher. We will ask you first, every time, and never pass on your details without your OK.</label>
-      </div>
-      <div class="row">
-        <div>
-          <label for="reporter_state">State you were in when you asked <span class="opt">optional</span></label>
-          <select id="reporter_state" name="reporter_state"><option value="">Choose one</option></select>
-        </div>
-        <div id="zip-wrap" hidden>
-          <label for="reporter_zip">ZIP code <span class="opt">optional</span></label>
-          <input type="text" id="reporter_zip" name="reporter_zip" inputmode="numeric" pattern="\d{5}" maxlength="5">
-        </div>
-      </div>
-      <span class="q">Did you try again and get the same wrong answer? <span class="opt">optional</span></span>
-      <div class="seg" data-name="reproduced"></div>
-      <span class="q">Did you act on the answer before finding out it was wrong? <span class="opt">optional</span></span>
-      <div class="seg" data-name="acted_on_it"></div>
-      <label class="check"><input type="checkbox" id="ok_to_publish"> You may publish this report as an example, with anything that could identify me removed.</label>
-      <label class="check"><input type="checkbox" id="affirm_real" required> This happened in my own everyday use. I did not set out to trick the AI into a wrong answer.</label>
-      <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
-    </fieldset>
+        <details class="more">
+          <summary>Add more detail</summary>
+          <label class="f" for="issue_other">Anything else about what went wrong <span class="opt">optional</span></label>
+          <input type="text" id="issue_other" name="issue_other" maxlength="300">
+          <label class="f" for="election_about">Which election or topic <span class="opt">optional</span></label>
+          <input type="text" id="election_about" name="election_about" placeholder="For example: November general election, a school board race" maxlength="200">
+          <label class="f" for="what_was_wrong">What was wrong, in your words <span class="opt">optional</span></label>
+          <textarea id="what_was_wrong" name="what_was_wrong" maxlength="5000"></textarea>
+        </details>
+      </fieldset>
 
-    <p class="errors" id="errors" role="alert" aria-live="assertive"></p>
-    <div class="submit-bar">
-      <button class="primary" type="submit" id="submit">Send report</button>
+      <fieldset class="step" data-step="3" hidden>
+        <legend class="title">Which AI, and when?</legend>
+        <div class="row">
+          <div>
+            <label class="f" for="product">Which AI <span class="req">required</span></label>
+            <select id="product" name="product" aria-describedby="err-product"><option value="">Choose one</option></select>
+            <p class="ferr" id="err-product"></p>
+          </div>
+          <div>
+            <label class="f" for="occurred_on">Date it happened <span class="req">required</span></label>
+            <input type="date" id="occurred_on" name="occurred_on" aria-describedby="err-occurred_on">
+            <p class="ferr" id="err-occurred_on"></p>
+          </div>
+        </div>
+        <div id="product-other-wrap" hidden>
+          <label class="f" for="product_other">Name of the AI</label>
+          <input type="text" id="product_other" name="product_other" maxlength="120">
+        </div>
+        <label class="f" for="surface">Where were you using it? <span class="req">required</span></label>
+        <select id="surface" name="surface" aria-describedby="err-surface"><option value="">Choose one</option></select>
+        <p class="ferr" id="err-surface"></p>
+        <span class="q" id="q-web">Was it searching the web when it answered? <span class="opt">optional</span></span>
+        <div class="seg" role="radiogroup" aria-labelledby="q-web" data-name="web_search_on"></div>
+        <details class="more">
+          <summary>Add more detail</summary>
+          <label class="f" for="surface_detail">If it was built into another app, which one? <span class="opt">optional</span></label>
+          <input type="text" id="surface_detail" name="surface_detail" placeholder="For example: Google Search, WhatsApp, Instagram" maxlength="200">
+          <label class="f" for="model_shown">Model or version, if it showed one <span class="opt">optional</span></label>
+          <input type="text" id="model_shown" name="model_shown" maxlength="120">
+          <div class="row">
+            <div>
+              <label class="f" for="device">Device <span class="opt">optional</span></label>
+              <select id="device" name="device"><option value="">Choose one</option></select>
+            </div>
+            <div>
+              <label class="f" for="language">Language you used <span class="opt">optional</span></label>
+              <input type="text" id="language" name="language" placeholder="For example: English, Spanish" maxlength="60">
+            </div>
+          </div>
+          <label class="f" for="occurred_time">Rough time of day <span class="opt">optional</span></label>
+          <input type="time" id="occurred_time" name="occurred_time">
+          <span class="q" id="q-paid">Were you on a paid plan? <span class="opt">optional</span></span>
+          <div class="seg" role="radiogroup" aria-labelledby="q-paid" data-name="paid_plan"></div>
+        </details>
+      </fieldset>
+
+      <fieldset class="step" data-step="4" hidden>
+        <legend class="title">You and your privacy</legend>
+        <p class="hint">You choose what we know. We never publish your name, email, phone, ZIP code or city.</p>
+        <fieldset class="modes">
+          <legend class="sr-only">How do you want to report?</legend>
+          <label class="mode"><input type="radio" name="reporting_mode" value="anonymous" checked>
+            <span><strong>Report anonymously</strong>We keep no name, contact info, ZIP code, city or device details. Just the state your connection came from.</span></label>
+          <label class="mode"><input type="radio" name="reporting_mode" value="contact">
+            <span><strong>Leave a way to reach me, kept private</strong>Stored apart from your report and seen only by our small review team. Reports we can follow up on carry more weight, because we can confirm the original with you.</span></label>
+        </fieldset>
+        <div class="contact-box" id="contact-fields" hidden>
+          <div class="row">
+            <div>
+              <label class="f" for="contact_email">Email</label>
+              <input type="email" id="contact_email" name="contact_email" maxlength="200" autocomplete="email" aria-describedby="err-contact_email">
+            </div>
+            <div>
+              <label class="f" for="contact_phone">Or phone</label>
+              <input type="text" id="contact_phone" name="contact_phone" maxlength="40" inputmode="tel" autocomplete="tel">
+            </div>
+          </div>
+          <p class="ferr" id="err-contact_email"></p>
+          <div class="row">
+            <div>
+              <label class="f" for="contact_name">Name <span class="opt">optional</span></label>
+              <input type="text" id="contact_name" name="contact_name" maxlength="120" autocomplete="name">
+            </div>
+            <div>
+              <label class="f" for="reporter_zip">ZIP code <span class="opt">optional</span></label>
+              <input type="text" id="reporter_zip" name="reporter_zip" inputmode="numeric" pattern="\d{5}" maxlength="5" autocomplete="postal-code">
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" id="ok_to_follow_up" checked> You may contact me to check details or ask for the original.</label>
+          <label class="check"><input type="checkbox" id="ok_to_refer"> I'm open to talking with a reporter or researcher. Ask me first, every time. Never share my details without my OK.</label>
+        </div>
+        <label class="f" for="reporter_state">Which state were you in when you asked? <span class="opt">optional</span></label>
+        <select id="reporter_state" name="reporter_state"><option value="">Choose one</option></select>
+        <span class="q" id="q-repro">Did you ask again and get the same wrong answer? <span class="opt">optional</span></span>
+        <div class="seg" role="radiogroup" aria-labelledby="q-repro" data-name="reproduced"></div>
+        <span class="q" id="q-acted">Did you act on it before finding out it was wrong? <span class="opt">optional</span></span>
+        <div class="seg" role="radiogroup" aria-labelledby="q-acted" data-name="acted_on_it"></div>
+        <label class="check"><input type="checkbox" id="ok_to_publish"> You may publish this as an example, with anything that could identify me removed.</label>
+        <label class="check strong"><input type="checkbox" id="affirm_real" aria-describedby="err-affirm_real"> This happened in my own everyday use. I didn't try to trick the AI into a wrong answer.</label>
+        <p class="ferr" id="err-affirm_real"></p>
+        <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+      </fieldset>
+
+      <p class="form-error" id="form-error" role="alert"></p>
+      <div class="nav-bar">
+        <button class="btn ghost" type="button" id="back" hidden>Back</button>
+        <button class="btn primary" type="submit" id="next">Continue</button>
+      </div>
+    </form>
+
+    <div class="thanks" id="thanks" tabindex="-1" role="status" hidden>
+      <h2>Thank you. Your report is in.</h2>
+      <p>Your reference number is <code id="ref"></code>.</p>
+      <p>We review every report, remove personal details, and look for patterns across AI tools, states and kinds of mistakes. What we find goes to the public, reporters, researchers and the people who set rules for these tools.</p>
+      <div class="actions">
+        <button class="btn primary" type="button" id="share" style="margin-left:0">Share this page</button>
+        <a class="btn ghost" href="/">Report another</a>
+      </div>
+      <p class="hint" id="share-note" aria-live="polite"></p>
     </div>
-  </form>
-
-  <div class="thanks" id="thanks" tabindex="-1">
-    <h2>Thank you. Your report is in.</h2>
-    <p>Your reference is <code id="ref"></code>. If you gave us an email and said we could, we may be in touch.</p>
-    <p>Saw another one? <a href="/">Send another report</a>.</p>
   </div>
 
   <section class="about" id="about">
-    <h2>Why this exists</h2>
-    <p>Most worry about AI and elections is about bad actors: deepfakes, fake robocalls, influence campaigns. This project looks at something quieter. Ordinary AI tools, used the ordinary way, sometimes give voters wrong answers.</p>
-    <p>A model can repeat rules from its training data that have since changed. It can pull in a forum post or a site built by a bot network and present it as fact. It can invent a detail outright. None of that needs a bad actor. It just needs a voter asking a normal question.</p>
-    <p>Test labs can show what a model might do. They cannot show what it did, to real people, in the weeks before a real election. Only reports from real use can do that. That is what we collect.</p>
-    <h3>What happens to your report</h3>
-    <p>Reports are stored privately. We review them, remove personal details, and look for patterns across AI products, states and types of error. We will publish findings and anonymized examples for the public, reporters, researchers and the people who write the rules for these tools.</p>
-    <h3>What we keep</h3>
-    <p>If you report anonymously: what you type and upload, and the country and state your connection came from. Nothing else. We cannot link your reports together from one day to the next.</p>
-    <p>If you leave contact details: the same, plus the city your connection came from, your browser type, and the details you gave us, stored apart from the report. Only the review team can see them. We never publish, sell or share them, and we ask you before putting you in touch with anyone.</p>
-    <p>We never store your internet address. Images have hidden location and camera data removed before they leave your device.</p>
-    <h3>This is not an official election resource</h3>
-    <p>For voting rules, check your state or local elections office. You can find yours at <a href="https://www.vote.gov/" rel="noopener">vote.gov</a>.</p>
+    <div class="about-grid">
+      <h2>About this project</h2>
+      <div>
+        <h3>Why it exists</h3>
+        <p>Most worry about AI and elections is about bad actors: deepfakes, fake robocalls, influence campaigns. This project looks at something quieter. Ordinary AI tools, used the ordinary way, sometimes get election facts wrong. Outdated training data, a bad source or a made-up detail is enough.</p>
+        <p>Test labs can show what a model might do. Only real reports show what it actually told real voters. That is what we collect.</p>
+        <h3>Who runs it</h3>
+        <p>AI Election Errors is run by <a href="https://hoplight.ai" rel="noopener">Hoplight</a>, an AI strategy firm. Hoplight covers the cost. No party, candidate, campaign or AI company funds it or has a say in it. We treat every AI tool the same way.</p>
+        <h3>If you build one of these tools</h3>
+        <p>You can respond to any report or finding, or flag a mistake in our work: <a href="mailto:whit@hoplight.ai">whit@hoplight.ai</a>.</p>
+      </div>
+      <div>
+        <h3>How we weigh reports</h3>
+        <p>We don't fact-check each report before storing it. Anything we publish is reviewed first, and stronger evidence counts for more:</p>
+        <ul class="levels">
+          <li><b>A</b>A share link to the conversation that anyone can check</li>
+          <li><b>B</b>A screenshot, and we can follow up with you</li>
+          <li><b>C</b>A screenshot, reported anonymously</li>
+          <li><b>D</b>Pasted text only</li>
+        </ul>
+        <h3>What we keep</h3>
+        <p><strong>Anonymous:</strong> what you type and upload, and the state your connection came from. We don't link your reports together.</p>
+        <p><strong>With contact info:</strong> the same, plus your city and browser type, and your contact details, stored separately and seen only by our review team. We never publish, sell or share them, and we ask before connecting you with anyone.</p>
+        <p>Our records never include your internet address. Photos lose their hidden location and camera data before they leave your device.</p>
+      </div>
+    </div>
   </section>
 </main>
-<footer><div class="wrap">AI Election Errors. An independent public-interest record, run by Hoplight.</div></footer>
+
+<footer class="site">
+  <div class="wrap cols">
+    <div><strong>AI Election Errors</strong><p>Independent and nonpartisan. Not affiliated with any party, candidate, campaign, government agency or AI company.</p></div>
+    <div><strong>Run by Hoplight</strong><p><a href="https://hoplight.ai" rel="noopener">hoplight.ai</a> · <a href="mailto:whit@hoplight.ai">whit@hoplight.ai</a></p></div>
+    <div><strong>Voting information</strong><p>This is not an official election resource. For rules and deadlines, visit <a href="https://www.vote.gov/" rel="noopener">vote.gov</a>.</p></div>
+  </div>
+</footer>
 
 <script type="module" src="/report-form.js"></script>
 </body>
