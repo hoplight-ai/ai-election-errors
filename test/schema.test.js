@@ -57,6 +57,40 @@ test('a screenshot can stand in for pasted text', () => {
   assert.deepEqual(errors, []);
 });
 
+test('anonymous is the default and keeps no contact details or ZIP', () => {
+  const { report, contact } = validateReport({ ...good, contact_email: 'a@b.co', contact_phone: '555', reporter_zip: '19103' });
+  assert.equal(report.reporting_mode, 'anonymous');
+  assert.equal(contact, null);
+  assert.equal(report.reporter_zip, '');
+  assert.ok(!JSON.stringify(report).includes('a@b.co'));
+});
+
+test('contact details are returned apart from the report, never inside it', () => {
+  const { report, contact, errors } = validateReport({
+    ...good, reporting_mode: 'contact', contact_email: 'a@b.co', contact_name: 'Pat', ok_to_follow_up: true, reporter_zip: '19103',
+  });
+  assert.deepEqual(errors, []);
+  assert.equal(contact.email, 'a@b.co');
+  assert.equal(contact.report_id, ID);
+  assert.ok(!JSON.stringify(report).includes('a@b.co'));
+  assert.ok(!JSON.stringify(report).includes('Pat'));
+  assert.equal(report.reporter_zip, '19103');
+  assert.equal(report.has_contact, true);
+});
+
+test('contact mode needs a way to reach the person', () => {
+  const { errors } = validateReport({ ...good, reporting_mode: 'contact' });
+  assert.ok(errors.some((e) => e.includes('anonymously')));
+});
+
+test('evidence level: share link A, reachable with screenshot B, anonymous screenshot C, text D', () => {
+  const shot = [{ url: 'https://abc.private.blob.vercel-storage.com/x', pathname: `attachments/${ID}/x.png` }];
+  assert.equal(validateReport({ ...good, share_link: 'https://chatgpt.com/share/x' }).report.evidence_level, 'A');
+  assert.equal(validateReport({ ...good, attachments: shot, reporting_mode: 'contact', contact_email: 'a@b.co', ok_to_follow_up: true }).report.evidence_level, 'B');
+  assert.equal(validateReport({ ...good, attachments: shot }).report.evidence_level, 'C');
+  assert.equal(validateReport(good).report.evidence_level, 'D');
+});
+
 test('non-object input does not throw', () => {
   assert.doesNotThrow(() => validateReport(null));
   assert.doesNotThrow(() => validateReport('x'));

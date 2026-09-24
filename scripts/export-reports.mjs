@@ -27,7 +27,7 @@ const cols = [
   'election_state', 'election_locality', 'election_about', 'reporter_state', 'reporter_zip',
   'net_country', 'net_region', 'net_city', 'reproduced', 'acted_on_it', 'prompt', 'response',
   'sources_cited', 'what_was_wrong', 'correct_info', 'share_link', 'attachment_count',
-  'ok_to_contact', 'ok_to_publish', 'contact_email', 'reporter_hash',
+  'evidence_level', 'reporting_mode', 'has_contact', 'ok_to_follow_up', 'ok_to_publish', 'reporter_hash',
 ];
 const cell = (v) => {
   const s = v == null ? '' : Array.isArray(v) ? v.join('; ') : String(v);
@@ -41,4 +41,20 @@ const csv = [cols.join(',')].concat(rows.map((r) => cols.map((c) => cell(
     : r[c],
 )).join(','))).join('\n') + '\n';
 writeFileSync(`exports/reports-${stamp}.csv`, csv);
-console.log(`${rows.length} reports -> exports/reports-${stamp}.jsonl and .csv`);
+console.log(`${rows.length} reports -> exports/reports-${stamp}.jsonl and .csv (no contact details)`);
+
+// Contact details come out only when asked for, into their own file.
+if (process.argv.includes('--with-contacts')) {
+  const contacts = [];
+  let c;
+  do {
+    const page = await list({ prefix: 'contacts/', cursor: c, limit: 1000 });
+    for (const b of page.blobs) {
+      const res = await get(b.pathname, { access: 'private' });
+      if (res?.statusCode === 200) contacts.push(JSON.parse(await new Response(res.stream).text()));
+    }
+    c = page.hasMore ? page.cursor : undefined;
+  } while (c);
+  writeFileSync(`exports/contacts-${stamp}.jsonl`, contacts.map((x) => JSON.stringify(x)).join('\n') + '\n');
+  console.log(`${contacts.length} contact records -> exports/contacts-${stamp}.jsonl`);
+}

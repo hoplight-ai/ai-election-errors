@@ -25,6 +25,14 @@ for (const seg of document.querySelectorAll('.seg')) {
     .map(([v, t]) => `<label><input type="radio" name="${n}" value="${v}">${t}</label>`).join('');
 }
 $('product').addEventListener('change', () => { $('product-other-wrap').hidden = $('product').value !== 'Other'; });
+const mode = () => document.querySelector('input[name="reporting_mode"]:checked')?.value || 'anonymous';
+for (const r of document.querySelectorAll('input[name="reporting_mode"]')) {
+  r.addEventListener('change', () => {
+    const withContact = mode() === 'contact';
+    $('contact-fields').hidden = !withContact;
+    $('zip-wrap').hidden = !withContact;
+  });
+}
 $('occurred_on').max = new Date().toISOString().slice(0, 10);
 
 // Attachments
@@ -45,22 +53,51 @@ function safeName(name) {
   return (cleaned || 'file').slice(-100);
 }
 
+// Redraws an image onto a blank canvas, which drops everything hidden in the file: GPS
+// location, camera, time stamps, editing history. Returns null if this browser cannot read it.
+async function cleanImage(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const c = document.createElement('canvas');
+    c.width = bmp.width; c.height = bmp.height;
+    c.getContext('2d').drawImage(bmp, 0, 0);
+    bmp.close?.();
+    const jpeg = /jpe?g|heic|heif/i.test(file.type) || /\.(jpe?g|heic|heif)$/i.test(file.name);
+    const type = jpeg ? 'image/jpeg' : 'image/png';
+    const out = await new Promise((res) => c.toBlob(res, type, 0.92));
+    if (!out) return null;
+    const name = file.name.replace(/\.[^.]+$/, '') + (jpeg ? '.jpg' : '.png');
+    return new File([out], name, { type });
+  } catch {
+    return null;
+  }
+}
+
+async function prepare(file) {
+  if (!file.type.startsWith('image/') && !/\.(heic|heif)$/i.test(file.name)) return file;
+  return cleanImage(file);
+}
+
 function addFiles(files) {
-  for (const file of files) {
+  for (const original of files) {
     if (attachments.size >= MAX_FILES) break;
     const key = crypto.randomUUID();
-    const entry = { file, status: 'uploading', blob: null };
+    const entry = { file: original, status: 'uploading', blob: null };
     attachments.set(key, entry);
-    if (file.size > MAX_BYTES) { entry.status = 'too big (50 MB max)'; render(); continue; }
+    if (original.size > MAX_BYTES) { entry.status = 'too big (50 MB max)'; render(); continue; }
     render();
-    upload(`attachments/${draftId}/${safeName(file.name)}`, file, {
-      access: 'private',
-      handleUploadUrl: '/api/upload',
-      contentType: file.type || undefined,
+    prepare(original).then((file) => {
+      if (!file) throw Object.assign(new Error('unreadable'), { clean: true });
+      return upload(`attachments/${draftId}/${safeName(file.name)}`, file, {
+        access: 'private',
+        handleUploadUrl: '/api/upload',
+        contentType: file.type || undefined,
+      });
     }).then((blob) => {
       entry.blob = blob; entry.status = 'done';
     }).catch((err) => {
-      console.error(err); entry.status = 'failed';
+      console.error(err);
+      entry.status = err.clean ? 'could not clean this image: send a screenshot of it instead' : 'failed';
     }).finally(render);
   }
 }
@@ -120,11 +157,14 @@ form.addEventListener('submit', async (e) => {
     reporter_zip: fd.get('reporter_zip'),
     reproduced: radio('reproduced'),
     acted_on_it: radio('acted_on_it'),
+    reporting_mode: mode(),
+    contact_name: fd.get('contact_name'),
     contact_email: fd.get('contact_email'),
-    ok_to_contact: $('ok_to_contact').checked,
+    contact_phone: fd.get('contact_phone'),
+    ok_to_follow_up: $('ok_to_follow_up').checked,
+    ok_to_refer: $('ok_to_refer').checked,
     ok_to_publish: $('ok_to_publish').checked,
     affirm_real: $('affirm_real').checked,
-    source_page: location.href,
     attachments: [...attachments.values()].filter((a) => a.status === 'done').map((a) => ({
       url: a.blob.url, pathname: a.blob.pathname, name: a.file.name, type: a.file.type, size: a.file.size,
     })),

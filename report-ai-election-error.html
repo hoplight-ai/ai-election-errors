@@ -103,6 +103,12 @@
   .files .st.ok { color: var(--ok); } .files .st.err { color: var(--bad); }
   .files button { border: 0; background: none; color: var(--ink-3); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 4px; }
 
+  .modes { display: grid; gap: 10px; margin: 6px 0 4px; }
+  .mode { display: flex; gap: 12px; align-items: flex-start; margin: 0; font-weight: 400; font-size: 15px; color: var(--ink-2);
+          border: 1px solid #d6d1c5; border-radius: 8px; padding: 14px; background: #fff; cursor: pointer; }
+  .mode strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 2px; }
+  .mode input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ink); flex: none; }
+  .mode:has(input:checked) { border-color: var(--ink); background: #fffbe6; box-shadow: inset 4px 0 0 var(--mark); }
   .check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; margin: 14px 0 0; }
   .check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ink); flex: none; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
@@ -202,7 +208,7 @@
 
     <fieldset>
       <legend><span class="step">Step 3 of 5</span>The conversation</legend>
-      <p class="hint">Screenshots are the best evidence. Pasting the text as well helps us search and compare reports.</p>
+      <p class="hint">Screenshots are the best evidence. Pasting the text as well helps us search and compare reports. Before you upload, crop out your name, photo, email or other chats in the sidebar. We remove hidden location data from images automatically.</p>
       <label class="drop" id="drop" tabindex="0">
         <input type="file" id="files" multiple accept="image/*,application/pdf,video/mp4,video/quicktime,video/webm,text/plain">
         <strong>Add screenshots, a screen recording or a PDF</strong>
@@ -240,26 +246,47 @@
     </fieldset>
 
     <fieldset>
-      <legend><span class="step">Step 5 of 5</span>About you</legend>
-      <p class="hint">All optional except the last box. We never publish your name, email or ZIP code.</p>
+      <legend><span class="step">Step 5 of 5</span>You and your privacy</legend>
+      <p class="hint">You choose how much we know. We never publish your name, email, phone, ZIP code or city, whichever you pick.</p>
+      <div class="modes">
+        <label class="mode"><input type="radio" name="reporting_mode" value="anonymous" checked>
+          <span><strong>Report anonymously</strong>
+          We keep no name or contact details, no ZIP code, no city and no device details. Only the state your connection came from.</span></label>
+        <label class="mode"><input type="radio" name="reporting_mode" value="contact">
+          <span><strong>Leave a way to reach me, kept private</strong>
+          Your details are stored apart from the report and seen only by the small team reviewing reports. Reports we can follow up on carry more weight with reporters, researchers and regulators, because we can check the original with you.</span></label>
+      </div>
+      <div id="contact-fields" hidden>
+        <div class="row">
+          <div>
+            <label for="contact_name">Name <span class="opt">optional</span></label>
+            <input type="text" id="contact_name" name="contact_name" maxlength="120" autocomplete="name">
+          </div>
+          <div>
+            <label for="contact_email">Email</label>
+            <input type="email" id="contact_email" name="contact_email" maxlength="200" autocomplete="email">
+          </div>
+        </div>
+        <label for="contact_phone">Phone <span class="opt">optional, instead of or as well as email</span></label>
+        <input type="text" id="contact_phone" name="contact_phone" maxlength="40" inputmode="tel" autocomplete="tel">
+        <label class="check"><input type="checkbox" id="ok_to_follow_up" checked> You may contact me to check details or ask for the original.</label>
+        <label class="check"><input type="checkbox" id="ok_to_refer"> I am open to talking with a reporter or researcher. We will ask you first, every time, and never pass on your details without your OK.</label>
+      </div>
       <div class="row">
         <div>
-          <label for="reporter_state">State you were in when you asked</label>
+          <label for="reporter_state">State you were in when you asked <span class="opt">optional</span></label>
           <select id="reporter_state" name="reporter_state"><option value="">Choose one</option></select>
         </div>
-        <div>
-          <label for="reporter_zip">ZIP code</label>
+        <div id="zip-wrap" hidden>
+          <label for="reporter_zip">ZIP code <span class="opt">optional</span></label>
           <input type="text" id="reporter_zip" name="reporter_zip" inputmode="numeric" pattern="\d{5}" maxlength="5">
         </div>
       </div>
-      <span class="q">Did you try again and get the same wrong answer?</span>
+      <span class="q">Did you try again and get the same wrong answer? <span class="opt">optional</span></span>
       <div class="seg" data-name="reproduced"></div>
-      <span class="q">Did you act on the answer before finding out it was wrong?</span>
+      <span class="q">Did you act on the answer before finding out it was wrong? <span class="opt">optional</span></span>
       <div class="seg" data-name="acted_on_it"></div>
-      <label for="contact_email">Email, if we may follow up</label>
-      <input type="email" id="contact_email" name="contact_email" maxlength="200" autocomplete="email">
-      <label class="check"><input type="checkbox" id="ok_to_contact"> You may contact me about this report.</label>
-      <label class="check"><input type="checkbox" id="ok_to_publish"> You may publish this report, with my personal details removed.</label>
+      <label class="check"><input type="checkbox" id="ok_to_publish"> You may publish this report as an example, with anything that could identify me removed.</label>
       <label class="check"><input type="checkbox" id="affirm_real" required> This happened in my own everyday use. I did not set out to trick the AI into a wrong answer.</label>
       <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
     </fieldset>
@@ -284,7 +311,9 @@
     <h3>What happens to your report</h3>
     <p>Reports are stored privately. We review them, remove personal details, and look for patterns across AI products, states and types of error. We will publish findings and anonymized examples for the public, reporters, researchers and the people who write the rules for these tools.</p>
     <h3>What we keep</h3>
-    <p>What you type and upload, plus the rough area your connection came from (country, state and city). We do not store your internet address. We never sell or share your contact details.</p>
+    <p>If you report anonymously: what you type and upload, and the country and state your connection came from. Nothing else. We cannot link your reports together from one day to the next.</p>
+    <p>If you leave contact details: the same, plus the city your connection came from, your browser type, and the details you gave us, stored apart from the report. Only the review team can see them. We never publish, sell or share them, and we ask you before putting you in touch with anyone.</p>
+    <p>We never store your internet address. Images have hidden location and camera data removed before they leave your device.</p>
     <h3>This is not an official election resource</h3>
     <p>For voting rules, check your state or local elections office. You can find yours at <a href="https://www.vote.gov/" rel="noopener">vote.gov</a>.</p>
   </section>
