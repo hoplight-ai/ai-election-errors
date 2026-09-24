@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/", "destination": "/report-ai-election-error.html" }
+    { "source": "/", "destination": "/report-ai-election-error" }
   ],
   "headers": [
     {
