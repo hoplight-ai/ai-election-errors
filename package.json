@@ -10,7 +10,8 @@
     "icons": "node scripts/make-icons.mjs",
     "test": "node --test test/*.test.js",
     "export": "node --env-file=.env.local scripts/export-reports.mjs",
-    "set-salt": "bash scripts/set-hash-salt.sh"
+    "set-salt": "bash scripts/set-hash-salt.sh",
+    "check:privacy": "node --env-file=.env.local scripts/check-privacy.mjs"
   },
   "dependencies": {
     "@vercel/blob": "2.8.0"
