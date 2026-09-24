@@ -25,7 +25,8 @@ const cardHtml = `<!doctype html><meta charset="utf-8">${FONT.replace('wght@8..6
   html,body{margin:0}
   body{width:1200px;height:630px;background:${PAPER};box-sizing:border-box;padding:64px 72px;
        display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:center;font-family:'Public Sans',sans-serif;color:${INK}}
-  .top{display:flex;align-items:center;gap:14px;font-weight:700;font-size:28px;margin-bottom:34px}
+  .top{display:flex;align-items:center;gap:14px;font-weight:700;font-size:28px;margin-bottom:34px;white-space:nowrap}
+  .tag{font-weight:500;color:${INK_2};margin-left:4px;padding-left:16px;border-left:2px solid #bdb7a9}
   h1{font-family:'Source Serif 4',Georgia,serif;font-size:66px;line-height:1.06;margin:0 0 28px;letter-spacing:-1px}
   .hl{background:linear-gradient(transparent 54%,${MARK} 54%,${MARK} 96%,transparent 96%)}
   .sub{font-size:28px;color:${INK_2};font-weight:600}
@@ -37,9 +38,9 @@ const cardHtml = `<!doctype html><meta charset="utf-8">${FONT.replace('wght@8..6
   .n{font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-weight:500;font-size:22px;margin:18px 0 0;padding-left:14px;border-left:4px solid ${INK}}
 </style>
 <div>
-  <div class="top">${LOGO}AI Election Errors</div>
+  <div class="top">${LOGO}AI Election Errors<span class="tag">Report the Bot</span></div>
   <h1>Did an AI give you <span class="hl">wrong</span> election information?</h1>
-  <div class="sub">Report it. Help build a shared record.</div>
+  <div class="sub">Report AI election misinformation.</div>
 </div>
 <div class="card">
   <div class="b you">When is the deadline to register to vote here?</div>
@@ -57,7 +58,7 @@ async function shot(html, w, h, file) {
   console.log('wrote', file);
 }
 for (const px of [32, 180, 192, 512]) await shot(iconHtml(px), px, px, `icon-ai-election-errors-${px}.png`);
-await shot(cardHtml, 1200, 630, 'og-ai-election-errors-1200x630.png');
+await shot(cardHtml, 1200, 630, 'og-ai-election-errors-report-the-bot-1200x630.png');
 await browser.close();
 
 // favicon.ico wrapping the 32px PNG (ICO files may embed a PNG directly).
