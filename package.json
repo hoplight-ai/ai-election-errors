@@ -2,12 +2,15 @@
   "name": "ai-election-errors",
   "private": true,
   "type": "module",
-  "engines": { "node": "24.x" },
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "build:client": "esbuild vendor-src/blob-client-entry.js --bundle --format=esm --minify --platform=browser --outfile=vendor/blob-client.js",
     "icons": "node scripts/make-icons.mjs",
     "test": "node --test test/*.test.js",
-    "export": "node --env-file=.env.local scripts/export-reports.mjs"
+    "export": "node --env-file=.env.local scripts/export-reports.mjs",
+    "set-salt": "bash scripts/set-hash-salt.sh"
   },
   "dependencies": {
     "@vercel/blob": "2.8.0"

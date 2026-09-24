@@ -2,3 +2,5 @@ node_modules/
 .vercel/
 .env*.local
 exports/
+.vercel
+.env*
