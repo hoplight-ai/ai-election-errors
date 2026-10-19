@@ -4,7 +4,7 @@ Public report form: people report AI tools giving wrong election information in 
 (stale training data, bot-farm or forum sources, made-up facts). Started 2026-09-24 to catalogue
 real-world, in-the-wild instances for regulators, press and researchers.
 
-- **Live:** https://ai-election-errors.vercel.app
+- **Live:** https://hoplight.ai/ai-election-errors (served by hoplight.ai from this project; the project's own address, https://ai-election-errors.vercel.app, still answers)
 - **Stack:** one static page (`report-ai-election-error.html`, served at `/` by a rewrite in
   `vercel.json`), `report-form.js`, and two Vercel functions in `api/`. No framework. The only
   build step is the vendored upload helper (`npm run build:client`, output committed; CI checks it

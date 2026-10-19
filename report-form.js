@@ -2,8 +2,8 @@
 // if the tab reloads, cleans and uploads attachments straight to private storage, and sends.
 import {
   ISSUE_TYPES, ISSUE_HINTS, PRODUCTS, SURFACES, DEVICES, US_STATES, STATE_NAMES, validateReport,
-} from '/lib/schema.js';
-import { upload } from '/vendor/blob-client.js';
+} from '/ai-election-errors/lib/schema.js';
+import { upload } from '/ai-election-errors/vendor/blob-client.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('report');
@@ -148,7 +148,7 @@ async function send(entry) {
     if (file.type.startsWith('image/')) entry.preview = URL.createObjectURL(file);
     entry.name = file.name; entry.type = file.type; entry.size = file.size;
     entry.blob = await upload(`attachments/${draftId}/${safeName(file.name)}`, file, {
-      access: 'private', handleUploadUrl: '/api/upload', contentType: file.type || undefined,
+      access: 'private', handleUploadUrl: '/ai-election-errors/api/upload', contentType: file.type || undefined,
     });
     entry.status = 'done';
   } catch (err) {
@@ -273,7 +273,7 @@ form.addEventListener('submit', async (e) => {
   const btn = $('next');
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
-    const res = await fetch('/api/report', {
+    const res = await fetch('/ai-election-errors/api/report', {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload()),
     });
     const out = await res.json().catch(() => ({}));
@@ -295,7 +295,7 @@ form.addEventListener('submit', async (e) => {
 });
 
 $('share').addEventListener('click', async () => {
-  const url = location.origin + '/';
+  const url = 'https://hoplight.ai/ai-election-errors';
   const text = 'Did an AI give you wrong election information? Report it here.';
   try {
     if (navigator.share) { await navigator.share({ title: 'AI Election Errors', text, url }); return; }

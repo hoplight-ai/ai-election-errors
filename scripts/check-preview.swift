@@ -3,7 +3,7 @@
 import Foundation
 import LinkPresentation
 
-let url = URL(string: CommandLine.arguments.dropFirst().first ?? "https://ai-election-errors.vercel.app/")!
+let url = URL(string: CommandLine.arguments.dropFirst().first ?? "https://hoplight.ai/ai-election-errors")!
 let provider = LPMetadataProvider()
 provider.timeout = 30
 var finished = false
